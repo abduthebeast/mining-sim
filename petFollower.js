@@ -1,4 +1,4 @@
-// petFollower.js
+// PetFollower.js
 
 class PetFollower {
   constructor(petMesh, playerMesh, offset = { x: 1.5, y: 0, z: -1 }) {
