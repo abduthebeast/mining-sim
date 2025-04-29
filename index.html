@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>3D Mining Simulator</title>
+  <style>
+    body { margin: 0; overflow: hidden; }
+    canvas { display: block; }
+    #ui {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      color: white;
+      font-family: sans-serif;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px;
+      z-index: 10;
+    }
+    button {
+      font-size: 16px;
+      margin-top: 5px;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    Health: <span id="health">100</span><br />
+    Coins: <span id="coins">0</span><br />
+    Ore: <span id="ore">0</span>/<span id="capacity">5</span><br />
+    <button id="hatchBtn">Hatch Egg</button><br />
+    <button id="shopBtn">Open Shop</button>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/three@0.154.0/build/three.min.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
