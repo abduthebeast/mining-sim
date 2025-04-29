@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mining Simulator</title>
+    <style>
+        /* Capacity Bar Styling */
+        #capacity-container {
+            width: 100%;
+            background-color: #f3f3f3;
+            border: 1px solid #000;
+            border-radius: 10px;
+            margin: 10px 0;
+            padding: 5px;
+        }
+
+        #capacity-bar {
+            height: 20px;
+            background-color: green;
+            border-radius: 10px;
+        }
+
+        #capacity-text {
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div id="capacity-container">
+        <div id="capacity-bar"></div>
+    </div>
+    <div id="capacity-text">Ore: 0 / 50</div>
+
+    <button id="sell-button" class="button">Sell Ore</button>
+    <button id="upgrade-button" class="button">Upgrade Backpack</button>
+
+    <script src="game.js"></script>
+</body>
+</html>
