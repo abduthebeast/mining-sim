@@ -29,93 +29,20 @@ const player = new THREE.Mesh(
 player.position.y = 1;
 scene.add(player);
 
+// Create a basic pet (a sphere in this case)
+let petMesh = new THREE.Mesh(
+  new THREE.SphereGeometry(1, 16, 16),  // Placeholder for a pet model
+  new THREE.MeshBasicMaterial({ color: 0xff0000 })  // Red pet to make it visible
+);
+
+// Position the pet slightly behind the player
+petMesh.position.set(player.position.x + 3, player.position.y, player.position.z);
+scene.add(petMesh);
+
 // Player movement
 let playerSpeed = 0.1;
 let moveDirection = new THREE.Vector3(0, 0, 0);
 
-// Capacity System
-let capacity = 0;
-const maxCapacity = 50;
-const capacityBar = document.getElementById('capacity-bar');
-const capacityText = document.getElementById('capacity-text');
-
-// Update Capacity Bar
-function updateCapacityBar() {
-    const percentage = (capacity / maxCapacity) * 100;
-    capacityBar.style.width = `${percentage}%`;
-    capacityText.textContent = `Ore: ${capacity} / ${maxCapacity}`;
-}
-
-// Egg Hatching
-let petInventory = [];
-let coins = 100;
-let eggs = [
-  { type: 'Basic Egg', cost: 20, pets: ['Dog', 'Cat', 'Rabbit', 'Bird'] },
-  { type: 'Rare Egg', cost: 50, pets: ['Lion', 'Tiger', 'Elephant', 'Eagle'] }
-];
-
-document.getElementById('hatch-button').addEventListener('click', function() {
-  if (coins >= eggs[0].cost) {
-    coins -= eggs[0].cost;
-    updateCoinsText();
-    const randomPet = eggs[0].pets[Math.floor(Math.random() * eggs[0].pets.length)];
-    petInventory.push(randomPet);
-    document.getElementById('pet-info').textContent = `You hatched a ${randomPet}!`;
-  } else {
-    alert('Not enough coins!');
-  }
-});
-
-// Shop System
-document.getElementById('shop-button').addEventListener('click', function() {
-  const shopUI = document.getElementById('shop-ui');
-  shopUI.style.display = shopUI.style.display === 'none' ? 'block' : 'none';
-
-  let shopContent = '<h3>Shop</h3>';
-  eggs.forEach(egg => {
-    shopContent += `<button onclick="buyEgg('${egg.type}')">${egg.type} - ${egg.cost} Coins</button><br>`;
-  });
-  document.getElementById('shop-content').innerHTML = shopContent;
-});
-
-function buyEgg(type) {
-  const egg = eggs.find(e => e.type === type);
-  if (coins >= egg.cost) {
-    coins -= egg.cost;
-    petInventory.push(egg.pets[Math.floor(Math.random() * egg.pets.length)]);
-    updateCoinsText();
-  } else {
-    alert('Not enough coins!');
-  }
-}
-
-function updateCoinsText() {
-  document.getElementById('coins-text').textContent = `Coins: ${coins}`;
-}
-
-// Pet Following System (dummy function for now)
-let petObject = null;
-
-function spawnPet() {
-  if (petInventory.length > 0) {
-    const petName = petInventory[0];
-    petObject = new THREE.Mesh(
-      new THREE.SphereGeometry(1, 16, 16),  // Placeholder for pet shape
-      new THREE.MeshBasicMaterial({ color: 0x00ff00 })
-    );
-    petObject.position.set(player.position.x + 3, player.position.y + 1, player.position.z);
-    scene.add(petObject);
-  }
-}
-
-// Camera follow player
-function cameraFollow() {
-  camera.position.x = player.position.x;
-  camera.position.z = player.position.z + 10;
-  camera.lookAt(player.position);
-}
-
-// Player movement
 document.addEventListener('keydown', function(event) {
   if (event.key === 'w') {
     moveDirection.z = -playerSpeed;
@@ -140,6 +67,32 @@ document.addEventListener('keyup', function(event) {
   }
 });
 
+// PetFollower class for making the pet follow the player
+class PetFollower {
+  constructor(petMesh, playerMesh, offset = { x: 1.5, y: 0, z: -1 }) {
+    this.pet = petMesh;
+    this.player = playerMesh;
+    this.offset = offset;
+  }
+
+  update() {
+    if (!this.pet || !this.player) return;
+
+    // Calculate desired position relative to player
+    const targetX = this.player.position.x + this.offset.x;
+    const targetY = this.player.position.y + this.offset.y;
+    const targetZ = this.player.position.z + this.offset.z;
+
+    // Smooth follow (optional)
+    this.pet.position.x += (targetX - this.pet.position.x) * 0.1;
+    this.pet.position.y += (targetY - this.pet.position.y) * 0.1;
+    this.pet.position.z += (targetZ - this.pet.position.z) * 0.1;
+  }
+}
+
+// Instantiate PetFollower for the pet and player
+const petFollower = new PetFollower(petMesh, player);
+
 // Update the scene
 function animate() {
   requestAnimationFrame(animate);
@@ -147,17 +100,13 @@ function animate() {
   // Move the player
   player.position.add(moveDirection);
 
-  // Update capacity bar
-  updateCapacityBar();
+  // Update the pet's position based on the player's position
+  petFollower.update();
 
   // Camera follow player
-  cameraFollow();
-
-  // Pet following player
-  if (petObject) {
-    petObject.position.x = player.position.x + 3;
-    petObject.position.z = player.position.z;
-  }
+  camera.position.x = player.position.x;
+  camera.position.z = player.position.z + 10;
+  camera.lookAt(player.position);
 
   // Render the scene
   renderer.render(scene, camera);
