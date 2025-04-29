@@ -1,37 +1,32 @@
+// Egg Hatching System
+let pets = {
+    common: { name: 'Common Pet', health: 10, damage: 5, rarity: 'Common' },
+    rare: { name: 'Rare Pet', health: 20, damage: 10, rarity: 'Rare' },
+    epic: { name: 'Epic Pet', health: 40, damage: 20, rarity: 'Epic' },
+    legendary: { name: 'Legendary Pet', health: 100, damage: 50, rarity: 'Legendary' }
+};
 
-let egg;
-let pet;
+// UI Elements
+let hatchButton = document.getElementById("hatch-button");
+let petDisplay = document.getElementById("pet-display");
+let petInfo = document.getElementById("pet-info");
 
-// Create an egg (placeholder)
-function createEgg() {
-    const geometry = new THREE.SphereGeometry(1, 32, 32); // Simple egg shape
-    const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
-    egg = new THREE.Mesh(geometry, material);
-    egg.position.set(0, 1, -5); // Position the egg in front of the player
-    scene.add(egg);
-}
-
-// Simulate the egg cracking animation (just a color change for now)
+// Function to Hatch Egg
 function hatchEgg() {
-    if (egg) {
-        const crackedMaterial = new THREE.MeshBasicMaterial({ color: 0xaaaaaa });
-        egg.material = crackedMaterial; // Change the color of the egg to "crack" it
-
-        // Spawn pet after animation (1 second delay)
-        setTimeout(() => createPet(), 1000);
-    }
+    let rarity = getRandomRarity();
+    let newPet = pets[rarity];
+    petDisplay.innerHTML = `You hatched a ${newPet.rarity} pet!`;
+    petInfo.innerHTML = `Name: ${newPet.name}<br>Health: ${newPet.health}<br>Damage: ${newPet.damage}`;
+    // Give pet boosts here (health/damage)
+    alert(`You hatched a ${newPet.rarity} pet: ${newPet.name}!`);
 }
 
-// Create a basic pet (can replace with an actual model later)
-function createPet() {
-    const petGeometry = new THREE.CylinderGeometry(0.5, 0.5, 2, 32); // Placeholder pet model
-    const petMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    pet = new THREE.Mesh(petGeometry, petMaterial);
-    pet.position.set(0, 1, -5); // Position the pet next to the egg
-    scene.add(pet);
+// Function to get a random pet rarity
+function getRandomRarity() {
+    let rarities = ['common', 'rare', 'epic', 'legendary'];
+    let randomIndex = Math.floor(Math.random() * rarities.length);
+    return rarities[randomIndex];
 }
 
-// Listen for egg hatching event when the button is clicked
-document.getElementById('hatchEggButton').addEventListener('click', function() {
-    hatchEgg(); // Trigger the egg hatching process
-});
+// Attach hatch egg function to button
+hatchButton.addEventListener("click", hatchEgg);
