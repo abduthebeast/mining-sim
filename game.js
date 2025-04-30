@@ -91,6 +91,12 @@ document.getElementById('shop-button').onclick = () => {
   shopUI.style.display = shopUI.style.display === 'none' ? 'block' : 'none';
 };
 
+// === Inventory Toggle ===
+document.getElementById('inventory-button').onclick = () => {
+  const inventoryUI = document.getElementById('inventory-ui');
+  inventoryUI.style.display = inventoryUI.style.display === 'none' ? 'block' : 'none';
+};
+
 // === Animation Loop ===
 function animate() {
   requestAnimationFrame(animate);
@@ -112,3 +118,4 @@ function animate() {
   renderer.render(scene, camera);
 }
 animate();
+
