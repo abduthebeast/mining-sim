@@ -117,12 +117,18 @@ function animate() {
   // Move player
   player.position.add(moveDirection);
 
-  // Update camera position based on player and mouse movement
-  camera.position.x = player.position.x;
-  camera.position.y = player.position.y + 2; // Set camera height
-  camera.position.z = player.position.z + 10;
-  camera.rotation.y = yaw;
-  camera.rotation.x = pitch;
+   const radius = 10; // distance from player
+  const cameraOffsetX = radius * Math.sin(yaw) * Math.cos(pitch);
+  const cameraOffsetY = radius * Math.sin(pitch);
+  const cameraOffsetZ = radius * Math.cos(yaw) * Math.cos(pitch);
+
+  camera.position.set(
+    player.position.x + cameraOffsetX,
+    player.position.y + 2 + cameraOffsetY, // slightly above player
+    player.position.z + cameraOffsetZ
+  );
+
+  camera.lookAt(player.position.x, player.position.y + 1, player.position.z);
 
   // Follow pet if there is one
   if (pet) petFollower.update();
