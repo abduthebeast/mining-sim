@@ -1,28 +1,24 @@
-// ---------------------------
-// Define PetFollower class first
-// ---------------------------
+// --- PetFollower class must come first ---
 class PetFollower {
-    constructor(petMesh, playerMesh, offset = { x: 1.5, y: 0, z: -1 }) {
-        this.pet = petMesh;
-        this.player = playerMesh;
-        this.offset = offset;
-    }
+  constructor(petMesh, playerMesh, offset = { x: 1.5, y: 0, z: -1 }) {
+    this.pet = petMesh;
+    this.player = playerMesh;
+    this.offset = offset;
+  }
 
-    update() {
-        if (!this.pet || !this.player) return;
-        const targetX = this.player.position.x + this.offset.x;
-        const targetY = this.player.position.y + this.offset.y;
-        const targetZ = this.player.position.z + this.offset.z;
+  update() {
+    if (!this.pet || !this.player) return;
+    const targetX = this.player.position.x + this.offset.x;
+    const targetY = this.player.position.y + this.offset.y;
+    const targetZ = this.player.position.z + this.offset.z;
 
-        this.pet.position.x += (targetX - this.pet.position.x) * 0.1;
-        this.pet.position.y += (targetY - this.pet.position.y) * 0.1;
-        this.pet.position.z += (targetZ - this.pet.position.z) * 0.1;
-    }
+    this.pet.position.x += (targetX - this.pet.position.x) * 0.1;
+    this.pet.position.y += (targetY - this.pet.position.y) * 0.1;
+    this.pet.position.z += (targetZ - this.pet.position.z) * 0.1;
+  }
 }
 
-// ---------------------------
-// Global variables
-// ---------------------------
+// --- Global variables ---
 let scene, camera, renderer, player, pet, petFollower;
 let moveDirection = new THREE.Vector3(0, 0, 0);
 let playerSpeed = 0.1;
@@ -31,101 +27,113 @@ init();
 animate();
 
 function init() {
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x87ceeb);
+  // Scene
+  scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x87ceeb);
 
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    camera.position.set(0, 5, 10);
+  // Camera
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  camera.position.set(0, 5, 10);
 
-    renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+  // Renderer
+  renderer = new THREE.WebGLRenderer();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(renderer.domElement);
 
-    const light = new THREE.DirectionalLight(0xffffff, 1);
-    light.position.set(5, 10, 5);
-    scene.add(light);
+  // Lighting
+  const light = new THREE.DirectionalLight(0xffffff, 1);
+  light.position.set(5, 10, 5);
+  scene.add(light);
 
-    const grass = new THREE.Mesh(
-        new THREE.PlaneGeometry(50, 50),
-        new THREE.MeshStandardMaterial({ color: 0x228B22 })
-    );
-    grass.rotation.x = -Math.PI / 2;
-    grass.position.set(0, 0, 0);
-    scene.add(grass);
+  // Ground
+  const grass = new THREE.Mesh(
+    new THREE.PlaneGeometry(50, 50),
+    new THREE.MeshStandardMaterial({ color: 0x228B22 })
+  );
+  grass.rotation.x = -Math.PI / 2;
+  scene.add(grass);
 
-    const mine = new THREE.Mesh(
-        new THREE.PlaneGeometry(20, 20),
-        new THREE.MeshStandardMaterial({ color: 0x8B4513 })
-    );
-    mine.rotation.x = -Math.PI / 2;
-    mine.position.set(30, 0.01, 0);
-    scene.add(mine);
+  // Mine Area
+  const mine = new THREE.Mesh(
+    new THREE.PlaneGeometry(20, 20),
+    new THREE.MeshStandardMaterial({ color: 0x8B4513 })
+  );
+  mine.rotation.x = -Math.PI / 2;
+  mine.position.set(30, 0.01, 0);
+  scene.add(mine);
 
-    player = new THREE.Mesh(
-        new THREE.BoxGeometry(1, 2, 1),
-        new THREE.MeshStandardMaterial({ color: 0xffff00 })
-    );
-    player.position.y = 1;
-    scene.add(player);
+  // Player
+  player = new THREE.Mesh(
+    new THREE.BoxGeometry(1, 2, 1),
+    new THREE.MeshStandardMaterial({ color: 0xffff00 })
+  );
+  player.position.y = 1;
+  scene.add(player);
 
-    pet = new THREE.Mesh(
-        new THREE.SphereGeometry(0.5),
-        new THREE.MeshStandardMaterial({ color: 0xff69b4 })
-    );
-    pet.position.set(player.position.x + 1.5, 0.5, player.position.z - 1);
-    scene.add(pet);
+  // Pet
+  pet = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5),
+    new THREE.MeshStandardMaterial({ color: 0xff69b4 })
+  );
+  pet.position.set(player.position.x + 1.5, 0.5, player.position.z - 1);
+  scene.add(pet);
 
-    petFollower = new PetFollower(pet, player);
+  // Pet follower logic
+  petFollower = new PetFollower(pet, player);
 
-    // UI Buttons
-    document.getElementById('hatch-button').onclick = hatchEgg;
-    document.getElementById('shop-button').onclick = toggleShop;
-    document.getElementById('inventory-button').onclick = toggleInventory;
+  // UI Event Handlers
+  document.getElementById('hatch-button').onclick = hatchEgg;
+  document.getElementById('shop-button').onclick = toggleShop;
+  document.getElementById('inventory-button').onclick = toggleInventory;
 
-    document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('keyup', onKeyUp);
+  // Movement
+  document.addEventListener('keydown', onKeyDown);
+  document.addEventListener('keyup', onKeyUp);
 }
 
 function animate() {
-    requestAnimationFrame(animate);
-    player.position.add(moveDirection);
+  requestAnimationFrame(animate);
 
-    camera.position.x = player.position.x;
-    camera.position.z = player.position.z + 10;
-    camera.lookAt(player.position);
+  player.position.add(moveDirection);
 
-    if (petFollower) petFollower.update();
+  camera.position.x = player.position.x;
+  camera.position.z = player.position.z + 10;
+  camera.lookAt(player.position);
 
-    renderer.render(scene, camera);
+  if (petFollower) petFollower.update();
+
+  renderer.render(scene, camera);
 }
 
 function onKeyDown(event) {
-    switch (event.key) {
-        case 'w': moveDirection.z = -playerSpeed; break;
-        case 's': moveDirection.z = playerSpeed; break;
-        case 'a': moveDirection.x = -playerSpeed; break;
-        case 'd': moveDirection.x = playerSpeed; break;
-    }
+  switch (event.key) {
+    case 'w': moveDirection.z = -playerSpeed; break;
+    case 's': moveDirection.z = playerSpeed; break;
+    case 'a': moveDirection.x = -playerSpeed; break;
+    case 'd': moveDirection.x = playerSpeed; break;
+  }
 }
 
 function onKeyUp(event) {
-    if (['w', 's'].includes(event.key)) moveDirection.z = 0;
-    if (['a', 'd'].includes(event.key)) moveDirection.x = 0;
+  if (['w', 's'].includes(event.key)) moveDirection.z = 0;
+  if (['a', 'd'].includes(event.key)) moveDirection.x = 0;
 }
 
-// Dummy Egg Hatch
+// Dummy egg hatching
 function hatchEgg() {
-    alert("You hatched a pet!");
+  const inv = document.getElementById('inventory-content');
+  inv.innerHTML += `<div>🐾 New Pet Hatched!</div>`;
+  alert("You hatched a pet!");
 }
 
-// Shop UI toggle
+// Toggle shop
 function toggleShop() {
-    const shopUI = document.getElementById('shop-ui');
-    shopUI.style.display = shopUI.style.display === 'none' ? 'block' : 'none';
+  const shopUI = document.getElementById('shop-ui');
+  shopUI.style.display = shopUI.style.display === 'none' ? 'block' : 'none';
 }
 
-// Inventory UI toggle
+// Toggle inventory
 function toggleInventory() {
-    const inventoryUI = document.getElementById('inventory-ui');
-    inventoryUI.style.display = inventoryUI.style.display === 'none' ? 'block' : 'none';
+  const inventoryUI = document.getElementById('inventory-ui');
+  inventoryUI.style.display = inventoryUI.style.display === 'none' ? 'block' : 'none';
 }
