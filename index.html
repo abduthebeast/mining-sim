@@ -42,6 +42,13 @@
 <body>
 
   <div id="capacity-text">Ore: 0 / 50</div>
+  
+<div id="ore-ui" style="position: absolute; top: 180px; left: 10px; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 6px;">
+  Ore: <span id="ore-count">0</span> / <span id="ore-max">50</span><br>
+  Coins: <span id="coin-count">100</span><br><br>
+  <button onclick="sellOre()">Sell Ore</button>
+</div>
+
   <button class="button" id="hatch-button">Hatch Egg</button>
   <button class="button" id="shop-button">Open Shop</button>
   <button class="button" id="inventory-button">Inventory</button>
