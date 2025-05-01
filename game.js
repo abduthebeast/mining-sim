@@ -21,7 +21,7 @@ class PetFollower {
 // --- Global variables ---
 let scene, camera, renderer, player, pet = null, petFollower;
 let moveDirection = new THREE.Vector3(0, 0, 0);
-let playerSpeed = 0.1; // Increased speed
+let playerSpeed = 0.3; // Increased speed
 let yaw = 0; // Mouse control for yaw
 let pitch = 0; // Mouse control for pitch
 let isPointerLocked = false;
@@ -29,6 +29,7 @@ let inventory = []; // Array to hold pets
 let coins = 100;
 let maxOre = 50;
 let currentOre = 0;
+let isMouseDown = false; // Track mouse click for rotating the camera
 
 init();
 animate();
@@ -88,19 +89,17 @@ function init() {
   document.getElementById('shop-button').onclick = toggleShop;
   document.getElementById('inventory-button').onclick = toggleInventory;
 
-  // Mouse Control - Pointer lock for mouse look
-  document.body.addEventListener('click', () => {
-    if (!isPointerLocked) {
-      renderer.domElement.requestPointerLock();
-    }
+  // Mouse Control - Now using mouse movement with mouse down to rotate camera
+  document.body.addEventListener('mousedown', () => {
+    isMouseDown = true;
   });
 
-  document.addEventListener('pointerlockchange', () => {
-    isPointerLocked = document.pointerLockElement === renderer.domElement;
+  document.body.addEventListener('mouseup', () => {
+    isMouseDown = false;
   });
 
   document.addEventListener('mousemove', (event) => {
-    if (isPointerLocked) {
+    if (isMouseDown) {
       yaw -= event.movementX * 0.002; // Adjust mouse sensitivity here
       pitch -= event.movementY * 0.002;
       pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch)); // Clamp pitch to avoid camera flipping
@@ -136,10 +135,10 @@ function onKeyDown(event) {
   const forward = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
   const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
   switch (event.key) {
-    case 'w': moveDirection.sub(forward.multiplyScalar(playerSpeed)); break;
-    case 's': moveDirection.add(forward.multiplyScalar(playerSpeed)); break;
-    case 'a': moveDirection.sub(right.multiplyScalar(playerSpeed)); break;
-    case 'd': moveDirection.add(right.multiplyScalar(playerSpeed)); break;
+    case 'w': moveDirection.add(forward.multiplyScalar(playerSpeed)); break;
+    case 's': moveDirection.sub(forward.multiplyScalar(playerSpeed)); break;
+    case 'a': moveDirection.add(right.multiplyScalar(playerSpeed)); break;
+    case 'd': moveDirection.sub(right.multiplyScalar(playerSpeed)); break;
   }
 }
 
@@ -171,7 +170,7 @@ function hatchEgg() {
 
 // Equip pet function
 function equipPet(petName) {
-  // Here you can make this logic more complex, but for now, it just equips the first pet.
+  // Equip the selected pet (you can add more logic to equip different pets here)
   alert(`Equipped pet: ${petName}`);
   petFollower = new PetFollower(pet, player); // Reassign the pet follower to the new pet
 }
