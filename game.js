@@ -141,10 +141,10 @@ function onKeyDown(event) {
   const forward = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
   const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
   switch (event.key) {
-    case 'w': moveDirection.add(forward.multiplyScalar(playerSpeed)); break;
-    case 's': moveDirection.sub(forward.multiplyScalar(playerSpeed)); break;
-    case 'a': moveDirection.add(right.multiplyScalar(playerSpeed)); break;
-    case 'd': moveDirection.sub(right.multiplyScalar(playerSpeed)); break;
+    case 'w': moveDirection.sub(forward.multiplyScalar(playerSpeed)); break;
+    case 's': moveDirection.add(forward.multiplyScalar(playerSpeed)); break;
+    case 'a': moveDirection.sub(right.multiplyScalar(playerSpeed)); break;
+    case 'd': moveDirection.add(right.multiplyScalar(playerSpeed)); break;
   }
 }
 
