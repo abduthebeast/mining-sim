@@ -30,6 +30,19 @@ let coins = 100;
 let maxOre = 50;
 let currentOre = 0;
 let isMouseDown = false; // Track mouse click for rotating the camera
+let ores = [];
+let oreTypes = [
+  { name: "Stone", color: 0x808080, value: 5 },
+  { name: "Iron", color: 0xb7410e, value: 15 },
+  { name: "Gold", color: 0xffd700, value: 30 },
+  { name: "Diamond", color: 0x00ffff, value: 60 }
+];
+let toolLevel = 1;
+let backpackLevel = 1;
+let miningCooldown = 0;
+let minedCount = 0;
+let mineSize = 20; // Initial mine area
+
 
 init();
 animate();
@@ -70,6 +83,25 @@ function init() {
   mine.position.set(30, 0.01, 0);
   scene.add(mine);
 
+  function generateOres() {
+  ores.forEach(o => scene.remove(o.mesh));
+  ores = [];
+  for (let i = 0; i < 40 + minedCount * 2; i++) {
+    const type = oreTypes[Math.floor(Math.random() * oreTypes.length)];
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial({ color: type.color });
+    const ore = new THREE.Mesh(geometry, material);
+    ore.position.set(
+      30 + (Math.random() - 0.5) * mineSize,
+      0.5,
+      (Math.random() - 0.5) * mineSize
+    );
+    ore.userData = { type };
+    ores.push({ mesh: ore, type });
+    scene.add(ore);
+  }
+}
+
   // Player
   player = new THREE.Mesh(
     new THREE.BoxGeometry(1, 2, 1),
@@ -83,6 +115,26 @@ function init() {
 
   // Pet follower logic
   petFollower = new PetFollower(pet, player);
+
+  if (miningCooldown > 0) miningCooldown--;
+
+ores.forEach((ore, index) => {
+  const dist = player.position.distanceTo(ore.mesh.position);
+  if (dist < 2 && miningCooldown === 0 && currentOre < maxOre) {
+    scene.remove(ore.mesh);
+    ores.splice(index, 1);
+    currentOre++;
+    coins += ore.type.value;
+    document.getElementById('capacity-text').innerText = `Ore: ${currentOre} / ${maxOre}`;
+    document.getElementById('coins-text').innerText = `Coins: ${coins}`;
+    miningCooldown = 30 - toolLevel * 5; // Faster tools = faster mining
+    minedCount++;
+    if (minedCount % 10 === 0) {
+      mineSize += 5;
+      generateOres(); // Expand mine and add new ores
+    }
+  }
+});
 
   // UI Event Handlers
   document.getElementById('hatch-button').onclick = hatchEgg;
@@ -309,4 +361,30 @@ function collectOre(ore) {
 
 // --- Initial mine generation ---
 spawnOreField();
+function upgradeTool() {
+  const cost = toolLevel * 50;
+  if (coins >= cost) {
+    coins -= cost;
+    toolLevel++;
+    alert(`Tool upgraded to level ${toolLevel}!`);
+    document.getElementById('coins-text').innerText = `Coins: ${coins}`;
+  } else {
+    alert("Not enough coins to upgrade tool!");
+  }
+}
+
+function upgradeBackpack() {
+  const cost = backpackLevel * 50;
+  if (coins >= cost) {
+    coins -= cost;
+    backpackLevel++;
+    maxOre += 50;
+    alert(`Backpack upgraded! New capacity: ${maxOre}`);
+    document.getElementById('coins-text').innerText = `Coins: ${coins}`;
+    document.getElementById('capacity-text').innerText = `Ore: ${currentOre} / ${maxOre}`;
+  } else {
+    alert("Not enough coins to upgrade backpack!");
+  }
+}
+
 
