@@ -5,120 +5,108 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Mining Simulator</title>
   <style>
-    body { margin: 0; overflow: hidden; font-family: sans-serif; }
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: sans-serif;
+    }
+
     .button {
       background-color: #4CAF50;
       border: none;
       color: white;
       padding: 10px 20px;
-      margin: 5px;
-      cursor: pointer;
-      border-radius: 5px;
       font-size: 16px;
+      cursor: pointer;
+      margin: 5px;
+      border-radius: 8px;
     }
-    #ui {
+
+    #capacity-container {
       position: absolute;
       top: 10px;
       left: 10px;
-      z-index: 1;
-    }
-    #capacity-bar {
       width: 200px;
       height: 20px;
       background: #ccc;
-      margin-bottom: 5px;
-      border-radius: 5px;
+      border: 1px solid #444;
     }
-    #capacity-fill {
+
+    #capacity-bar {
       height: 100%;
       width: 0%;
-      background: orange;
-      border-radius: 5px;
+      background: #4CAF50;
     }
-    #capacity-text, #coins-text {
-      margin-bottom: 10px;
+
+    #capacity-text {
+      position: absolute;
+      top: 35px;
+      left: 10px;
+      color: #000;
+      font-weight: bold;
     }
-    #shop-ui, #inventory-ui {
-      display: none;
-      background: white;
+
+    #hatch-button, #shop-button {
+      position: absolute;
+      top: 70px;
+      left: 10px;
+    }
+
+    #shop-button {
+      top: 110px;
+    }
+
+    #pet-display, #pet-info {
+      position: absolute;
+      top: 160px;
+      left: 10px;
+      color: white;
+    }
+
+    #shop-ui {
+      position: absolute;
+      top: 200px;
+      left: 10px;
+      width: 250px;
       padding: 10px;
-      border: 1px solid #000;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid #333;
+      display: none;
+    }
+
+    #coins-text {
       margin-top: 10px;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div id="ui">
-    <div id="capacity-bar"><div id="capacity-fill"></div></div>
-    <div id="capacity-text">Ore: 0 / 50</div>
+
+  <!-- Capacity Bar -->
+  <div id="capacity-container">
+    <div id="capacity-bar"></div>
+  </div>
+  <div id="capacity-text">Ore: 0 / 50</div>
+
+  <!-- Buttons -->
+  <button id="hatch-button" class="button">Hatch Egg</button>
+  <button id="shop-button" class="button">Open Shop</button>
+
+  <!-- Pet Info -->
+  <div id="pet-display"></div>
+  <div id="pet-info"></div>
+
+  <!-- Shop UI -->
+  <div id="shop-ui">
+    <div id="shop-content">Welcome to the Shop!</div>
     <div id="coins-text">Coins: 100</div>
-    <button id="hatch-button" class="button">Hatch Egg</button>
-    <button id="shop-button" class="button">Open Shop</button><!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mining Simulator</title>
-    <style>
-        /* Basic styles for buttons and UI */
-        .button {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 15px 32px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 10px 2px;
-            cursor: pointer;
-            border-radius: 10px;
-        }
-
-        #shop-ui {
-            border: 2px solid #333;
-            padding: 20px;
-            background-color: rgba(255, 255, 255, 0.8);
-        }
-    </style>
-</head>
-<body>
-
-    <!-- Capacity Bar -->
-    <div id="capacity-container">
-        <div id="capacity-bar"></div>
-    </div>
-    <div id="capacity-text">Ore: 0 / 50</div>
-    
-    <!-- Egg Hatching UI -->
-    <button id="hatch-button" class="button">Hatch Egg</button>
-    <div id="pet-display"></div>
-    <div id="pet-info"></div>
-
-    <!-- Shop UI -->
-    <button id="shop-button" class="button">Open Shop</button>
-    <div id="shop-ui" style="display:none;">
-        <div id="shop-content"></div>
-        <div id="coins-text">Coins: 100</div>
-    </div>
-
-    <!-- Include THREE.js Library -->
-    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-    
-    <!-- Your custom game.js script -->
-    <script src="game.js"></script>
-</body>
-</html>
-
-    <button id="inventory-button" class="button">Inventory</button>
-    <div id="shop-ui">
-      <p>Shop Content (e.g., Buy tools, backpacks, eggs)</p>
-    </div>
-    <div id="inventory-ui">
-      <p>Inventory Content (e.g., List of pets and blocks)</p>
-    </div>
   </div>
 
-  <script type="module" src="game.js"></script>
+  <!-- Load Three.js FIRST -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+
+  <!-- Then load your game logic -->
+  <script src="game.js"></script>
+
 </body>
 </html>
