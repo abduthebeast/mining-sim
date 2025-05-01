@@ -101,7 +101,7 @@ function init() {
   document.addEventListener('mousemove', (event) => {
     if (isMouseDown) {
       yaw -= event.movementX * 0.002; // Adjust mouse sensitivity here
-      pitch -= event.movementY * 0.002;
+      pitch += event.movementY * 0.002;
       pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch)); // Clamp pitch to avoid camera flipping
     }
   });
