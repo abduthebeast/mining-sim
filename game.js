@@ -21,7 +21,7 @@ class PetFollower {
 // --- Global variables ---
 let scene, camera, renderer, player, pet = null, petFollower;
 let moveDirection = new THREE.Vector3(0, 0, 0);
-let playerSpeed = 0.3; // Increased speed
+let playerSpeed = 0.1; // Increased speed
 let yaw = 0; // Mouse control for yaw
 let pitch = 0; // Mouse control for pitch
 let isPointerLocked = false;
@@ -136,10 +136,10 @@ function onKeyDown(event) {
   const forward = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
   const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
   switch (event.key) {
-    case 'w': moveDirection.add(forward.multiplyScalar(playerSpeed)); break;
-    case 's': moveDirection.sub(forward.multiplyScalar(playerSpeed)); break;
-    case 'a': moveDirection.add(right.multiplyScalar(playerSpeed)); break;
-    case 'd': moveDirection.sub(right.multiplyScalar(playerSpeed)); break;
+    case 'w': moveDirection.sub(forward.multiplyScalar(playerSpeed)); break;
+    case 's': moveDirection.add(forward.multiplyScalar(playerSpeed)); break;
+    case 'a': moveDirection.sub(right.multiplyScalar(playerSpeed)); break;
+    case 'd': moveDirection.add(right.multiplyScalar(playerSpeed)); break;
   }
 }
 
