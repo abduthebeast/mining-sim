@@ -32,41 +32,37 @@
       top: 120px;
       display: none;
     }
+  </style>
+</head>
+<body>
 
- <div id="shop-ui">
-  <div>Welcome to the Shop</div>
-  <div id="coins-text">Coins: 100</div>
-  <button class="button" onclick="upgradeTool()">Upgrade Tool</button>
-  <button class="button" onclick="upgradeBackpack()">Upgrade Backpack</button>
-</div>
-
+  <div id="shop-ui" style="display: none;">
+    <div>Welcome to the Shop</div>
+    <div id="coins-text">Coins: 100</div>
+    <button class="button" onclick="upgradeTool()">Upgrade Tool</button>
+    <button class="button" onclick="upgradeBackpack()">Upgrade Backpack</button>
+  </div>
 
   <div id="capacity-text">Ore: 0 / 50</div>
   
-<div id="ore-ui" style="position: absolute; top: 180px; left: 10px; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 6px;">
-  Ore: <span id="ore-count">0</span> / <span id="ore-max">50</span><br>
-  Coins: <span id="coin-count">100</span><br><br>
-  <button onclick="sellOre()">Sell Ore</button>
-</div>
+  <div id="ore-ui" style="position: absolute; top: 180px; left: 10px; background: rgba(255,255,255,0.8); padding: 10px; border-radius: 6px;">
+    Ore: <span id="ore-count">0</span> / <span id="ore-max">50</span><br>
+    Coins: <span id="coin-count">100</span><br><br>
+    <button onclick="sellOre()">Sell Ore</button>
+  </div>
 
   <button class="button" id="hatch-button">Hatch Egg</button>
   <button class="button" id="shop-button">Open Shop</button>
   <button class="button" id="inventory-button">Inventory</button>
-
-  <div id="shop-ui">
-    <div>Welcome to the Shop</div>
-    <div id="coins-text">Coins: 100</div>
-  </div>
 
   <div id="inventory-ui">
     <div>Your Pets & Items</div>
     <div id="inventory-content">No pets yet.</div>
   </div>
 
-  <!-- ✅ Correctly load THREE.js first -->
+  <!-- Load THREE.js -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.150.1/build/three.min.js"></script>
-
-  <!-- ✅ Your main game script -->
+  <!-- Your game script -->
   <script src="game.js"></script>
 </body>
 </html>
