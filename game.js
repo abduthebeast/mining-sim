@@ -1,3 +1,7 @@
+let yaw = 0;
+let pitch = 0;
+let isPointerLocked = false;
+
 // --- PetFollower class must come first ---
 class PetFollower {
   constructor(petMesh, playerMesh, offset = { x: 1.5, y: 0, z: -1 }) {
@@ -21,7 +25,7 @@ class PetFollower {
 // --- Global variables ---
 let scene, camera, renderer, player, pet, petFollower;
 let moveDirection = new THREE.Vector3(0, 0, 0);
-let playerSpeed = 0.1;
+let playerSpeed = 0.2;
 
 init();
 animate();
