@@ -53,7 +53,63 @@
     <div id="capacity-text">Ore: 0 / 50</div>
     <div id="coins-text">Coins: 100</div>
     <button id="hatch-button" class="button">Hatch Egg</button>
+    <button id="shop-button" class="button">Open Shop</button><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mining Simulator</title>
+    <style>
+        /* Basic styles for buttons and UI */
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 10px 2px;
+            cursor: pointer;
+            border-radius: 10px;
+        }
+
+        #shop-ui {
+            border: 2px solid #333;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Capacity Bar -->
+    <div id="capacity-container">
+        <div id="capacity-bar"></div>
+    </div>
+    <div id="capacity-text">Ore: 0 / 50</div>
+    
+    <!-- Egg Hatching UI -->
+    <button id="hatch-button" class="button">Hatch Egg</button>
+    <div id="pet-display"></div>
+    <div id="pet-info"></div>
+
+    <!-- Shop UI -->
     <button id="shop-button" class="button">Open Shop</button>
+    <div id="shop-ui" style="display:none;">
+        <div id="shop-content"></div>
+        <div id="coins-text">Coins: 100</div>
+    </div>
+
+    <!-- Include THREE.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+    
+    <!-- Your custom game.js script -->
+    <script src="game.js"></script>
+</body>
+</html>
+
     <button id="inventory-button" class="button">Inventory</button>
     <div id="shop-ui">
       <p>Shop Content (e.g., Buy tools, backpacks, eggs)</p>
