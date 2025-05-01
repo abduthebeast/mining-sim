@@ -1,7 +1,3 @@
-let yaw = 0;
-let pitch = 0;
-let isPointerLocked = false;
-
 // --- PetFollower class must come first ---
 class PetFollower {
   constructor(petMesh, playerMesh, offset = { x: 1.5, y: 0, z: -1 }) {
@@ -25,7 +21,10 @@ class PetFollower {
 // --- Global variables ---
 let scene, camera, renderer, player, pet, petFollower;
 let moveDirection = new THREE.Vector3(0, 0, 0);
-let playerSpeed = 0.2;
+let playerSpeed = 0.3; // Increased speed
+let yaw = 0; // Mouse control for yaw
+let pitch = 0; // Mouse control for pitch
+let isPointerLocked = false;
 
 init();
 animate();
@@ -90,6 +89,25 @@ function init() {
   document.getElementById('shop-button').onclick = toggleShop;
   document.getElementById('inventory-button').onclick = toggleInventory;
 
+  // Mouse Control - Pointer lock for mouse look
+  document.body.addEventListener('click', () => {
+    if (!isPointerLocked) {
+      renderer.domElement.requestPointerLock();
+    }
+  });
+
+  document.addEventListener('pointerlockchange', () => {
+    isPointerLocked = document.pointerLockElement === renderer.domElement;
+  });
+
+  document.addEventListener('mousemove', (event) => {
+    if (isPointerLocked) {
+      yaw -= event.movementX * 0.002; // Adjust mouse sensitivity here
+      pitch -= event.movementY * 0.002;
+      pitch = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitch)); // Clamp pitch to avoid camera flipping
+    }
+  });
+
   // Movement
   document.addEventListener('keydown', onKeyDown);
   document.addEventListener('keyup', onKeyUp);
@@ -98,29 +116,35 @@ function init() {
 function animate() {
   requestAnimationFrame(animate);
 
+  // Move player
   player.position.add(moveDirection);
 
+  // Update camera position based on player and mouse movement
   camera.position.x = player.position.x;
+  camera.position.y = player.position.y + 2; // Set camera height
   camera.position.z = player.position.z + 10;
-  camera.lookAt(player.position);
+  camera.rotation.y = yaw;
+  camera.rotation.x = pitch;
 
+  // Follow pet
   if (petFollower) petFollower.update();
 
   renderer.render(scene, camera);
 }
 
 function onKeyDown(event) {
+  const forward = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
+  const right = new THREE.Vector3(Math.cos(yaw), 0, -Math.sin(yaw));
   switch (event.key) {
-    case 'w': moveDirection.z = -playerSpeed; break;
-    case 's': moveDirection.z = playerSpeed; break;
-    case 'a': moveDirection.x = -playerSpeed; break;
-    case 'd': moveDirection.x = playerSpeed; break;
+    case 'w': moveDirection.add(forward.multiplyScalar(playerSpeed)); break;
+    case 's': moveDirection.sub(forward.multiplyScalar(playerSpeed)); break;
+    case 'a': moveDirection.add(right.multiplyScalar(playerSpeed)); break;
+    case 'd': moveDirection.sub(right.multiplyScalar(playerSpeed)); break;
   }
 }
 
 function onKeyUp(event) {
-  if (['w', 's'].includes(event.key)) moveDirection.z = 0;
-  if (['a', 'd'].includes(event.key)) moveDirection.x = 0;
+  moveDirection.set(0, 0, 0); // Stop movement on key release
 }
 
 // Dummy egg hatching
