@@ -106,10 +106,13 @@ function init() {
     }
   });
 
-  // Movement
+  // Movement 
   document.addEventListener('keydown', onKeyDown);
   document.addEventListener('keyup', onKeyUp);
+
+  updateOreUI(); // ✅ Add this here
 }
+
 
 function animate() {
   requestAnimationFrame(animate);
@@ -208,5 +211,30 @@ function updateInventoryDisplay() {
         </div>
       `;
     });
+  }
+}
+function updateOreUI() {
+  document.getElementById('ore-count').textContent = currentOre;
+  document.getElementById('ore-max').textContent = maxOre;
+  document.getElementById('coin-count').textContent = coins;
+  document.getElementById('coins-text').textContent = `Coins: ${coins}`;
+}
+
+function sellOre() {
+  if (currentOre > 0) {
+    const sellValue = 5; // 5 coins per ore
+    const earnings = currentOre * sellValue;
+    coins += earnings;
+    currentOre = 0;
+    alert(`You sold your ore for ${earnings} coins!`);
+    updateOreUI();
+    function updateCapacityDisplay() {
+  const capText = document.getElementById('capacity-text');
+  capText.textContent = `Ore: ${currentOre} / ${maxOre}`;
+  updateOreUI();
+}
+
+  } else {
+    alert("You don't have any ore to sell!");
   }
 }
