@@ -101,6 +101,7 @@ function init() {
     scene.add(ore);
   }
 }
+generateOres();
 
   // Player
   player = new THREE.Mesh(
