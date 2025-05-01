@@ -19,12 +19,16 @@ class PetFollower {
 }
 
 // --- Global variables ---
-let scene, camera, renderer, player, pet, petFollower;
+let scene, camera, renderer, player, pet = null, petFollower;
 let moveDirection = new THREE.Vector3(0, 0, 0);
 let playerSpeed = 0.3; // Increased speed
 let yaw = 0; // Mouse control for yaw
 let pitch = 0; // Mouse control for pitch
 let isPointerLocked = false;
+let inventory = []; // Array to hold pets
+let coins = 100;
+let maxOre = 50;
+let currentOre = 0;
 
 init();
 animate();
@@ -73,13 +77,8 @@ function init() {
   player.position.y = 1;
   scene.add(player);
 
-  // Pet
-  pet = new THREE.Mesh(
-    new THREE.SphereGeometry(0.5),
-    new THREE.MeshStandardMaterial({ color: 0xff69b4 })
-  );
-  pet.position.set(player.position.x + 1.5, 0.5, player.position.z - 1);
-  scene.add(pet);
+  // Pet (initially set to null)
+  pet = null;
 
   // Pet follower logic
   petFollower = new PetFollower(pet, player);
@@ -126,9 +125,10 @@ function animate() {
   camera.rotation.y = yaw;
   camera.rotation.x = pitch;
 
-  // Follow pet
-  if (petFollower) petFollower.update();
+  // Follow pet if there is one
+  if (pet) petFollower.update();
 
+  // Rendering
   renderer.render(scene, camera);
 }
 
@@ -147,11 +147,33 @@ function onKeyUp(event) {
   moveDirection.set(0, 0, 0); // Stop movement on key release
 }
 
-// Dummy egg hatching
+// Hatch egg function
 function hatchEgg() {
-  const inv = document.getElementById('inventory-content');
-  inv.innerHTML += `<div>🐾 New Pet Hatched!</div>`;
-  alert("You hatched a pet!");
+  if (inventory.length < 10) {
+    const petName = `Pet ${inventory.length + 1}`;
+    inventory.push(petName);
+    updateInventoryDisplay();
+    alert(`You hatched a new pet: ${petName}`);
+    if (!pet) {
+      // If you don't have a pet yet, the first pet will be spawned
+      pet = new THREE.Mesh(
+        new THREE.SphereGeometry(0.5),
+        new THREE.MeshStandardMaterial({ color: 0xff69b4 })
+      );
+      pet.position.set(player.position.x + 1.5, 0.5, player.position.z - 1);
+      scene.add(pet);
+      petFollower = new PetFollower(pet, player); // Reassign follower
+    }
+  } else {
+    alert("You have reached the maximum pet limit!");
+  }
+}
+
+// Equip pet function
+function equipPet(petName) {
+  // Here you can make this logic more complex, but for now, it just equips the first pet.
+  alert(`Equipped pet: ${petName}`);
+  petFollower = new PetFollower(pet, player); // Reassign the pet follower to the new pet
 }
 
 // Toggle shop
@@ -164,4 +186,22 @@ function toggleShop() {
 function toggleInventory() {
   const inventoryUI = document.getElementById('inventory-ui');
   inventoryUI.style.display = inventoryUI.style.display === 'none' ? 'block' : 'none';
+}
+
+// Update the inventory UI with the current pets
+function updateInventoryDisplay() {
+  const inv = document.getElementById('inventory-content');
+  inv.innerHTML = ''; // Clear previous content
+  if (inventory.length === 0) {
+    inv.innerHTML = 'No pets yet.';
+  } else {
+    inventory.forEach((petName, index) => {
+      inv.innerHTML += `
+        <div>
+          ${petName} 
+          <button onclick="equipPet('${petName}')">Equip</button>
+        </div>
+      `;
+    });
+  }
 }
