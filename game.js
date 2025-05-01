@@ -1,73 +1,77 @@
-import * as THREE from 'three';
+// Game setup
+const scene = new THREE.Scene();
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+const renderer = new THREE.WebGLRenderer();
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-let scene, camera, renderer;
-let player, playerSpeed = 0.2;
-let keysPressed = {};
-let ores = [];
-let mineSize = 10;
-let minedOres = 0;
-let mineThreshold = 20;
-let capacity = 10;
-let carriedOres = 0;
+// Lighting
+const light = new THREE.DirectionalLight(0xffffff, 1);
+light.position.set(5, 10, 7.5);
+scene.add(light);
+scene.add(new THREE.AmbientLight(0x404040));
+
+// Ground
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(100, 100),
+  new THREE.MeshStandardMaterial({ color: 0x8B4513 })
+);
+ground.rotation.x = -Math.PI / 2;
+scene.add(ground);
+
+// Player
+const player = new THREE.Mesh(
+  new THREE.BoxGeometry(1, 2, 1),
+  new THREE.MeshStandardMaterial({ color: 0x00ff00 })
+);
+player.position.y = 1;
+scene.add(player);
+
+// Camera
+camera.position.set(0, 10, 10);
+camera.lookAt(player.position);
+
+// Controls
+const keysPressed = {};
+document.addEventListener('keydown', e => keysPressed[e.key.toLowerCase()] = true);
+document.addEventListener('keyup', e => keysPressed[e.key.toLowerCase()] = false);
+
+// UI Elements
 let money = 0;
-let shopUI, capacityText, moneyText;
+let capacity = 10;
+let currentOre = 0;
+document.getElementById('money').innerText = money;
+document.getElementById('capacity').innerText = `${currentOre}/${capacity}`;
 
+// Ore types
 const oreTypes = [
-  { name: 'Stone', color: 0x888888, value: 1, rarity: 0.6 },
-  { name: 'Iron', color: 0xb7410e, value: 5, rarity: 0.25 },
-  { name: 'Gold', color: 0xffd700, value: 10, rarity: 0.1 },
-  { name: 'Diamond', color: 0x00ffff, value: 25, rarity: 0.05 }
+  { name: "Coal", color: 0x333333, value: 1, rarity: 0.6 },
+  { name: "Iron", color: 0xbbbbbb, value: 5, rarity: 0.25 },
+  { name: "Gold", color: 0xffd700, value: 10, rarity: 0.1 },
+  { name: "Diamond", color: 0x00ffff, value: 50, rarity: 0.05 }
 ];
 
-init();
-animate();
-
-function init() {
-  scene = new THREE.Scene();
-  scene.background = new THREE.Color(0xa0a0a0);
-
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-  camera.position.set(0, 5, 10);
-
-  renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
-
-  const light = new THREE.HemisphereLight(0xffffff, 0x444444);
-  light.position.set(0, 20, 0);
-  scene.add(light);
-
-  const ground = new THREE.Mesh(
-    new THREE.BoxGeometry(50, 1, 50),
-    new THREE.MeshStandardMaterial({ color: 0x8b4513 })
-  );
-  ground.position.y = -0.5;
-  scene.add(ground);
-
-  player = new THREE.Mesh(
-    new THREE.BoxGeometry(1, 2, 1),
-    new THREE.MeshStandardMaterial({ color: 0x0000ff })
-  );
-  player.position.y = 1;
-  scene.add(player);
-
-  generateMine();
-
-  document.addEventListener('keydown', (e) => keysPressed[e.key] = true);
-  document.addEventListener('keyup', (e) => keysPressed[e.key] = false);
-
-  setupUI();
+// Utility to pick a random ore type
+function getRandomOreType() {
+  const rand = Math.random();
+  let sum = 0;
+  for (const ore of oreTypes) {
+    sum += ore.rarity;
+    if (rand < sum) return ore;
+  }
+  return oreTypes[0];
 }
+
+// Mine generation
+let ores = [];
+let mineSize = 20;
 function generateMine() {
   const orePositions = new Set(ores.map(o => `${o.position.x},${o.position.z}`));
   const half = mineSize / 2;
 
   for (let x = -half; x < half; x++) {
     for (let z = -half; z < half; z++) {
-      // Only spawn on outer edge of new mine expansion
-      if (
-        Math.abs(x) >= half - 5 || Math.abs(z) >= half - 5
-      ) {
+      if (Math.abs(x) >= half - 5 || Math.abs(z) >= half - 5) {
         const key = `${x},${z}`;
         if (!orePositions.has(key) && Math.random() < 0.3) {
           const oreType = getRandomOreType();
@@ -86,89 +90,79 @@ function generateMine() {
   }
 }
 
-
-function getRandomOreType() {
-  let rand = Math.random();
-  let sum = 0;
-  for (const ore of oreTypes) {
-    sum += ore.rarity;
-    if (rand <= sum) return ore;
+// Mining
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+window.addEventListener('click', () => {
+  raycaster.setFromCamera({ x: 0, y: 0 }, camera);
+  const intersects = raycaster.intersectObjects(ores);
+  if (intersects.length > 0) {
+    const ore = intersects[0].object;
+    if (currentOre < capacity) {
+      currentOre++;
+      money += ore.userData.type.value;
+      document.getElementById('money').innerText = money;
+      document.getElementById('capacity').innerText = `${currentOre}/${capacity}`;
+      scene.remove(ore);
+      ores = ores.filter(o => o !== ore);
+    }
   }
-  return oreTypes[0]; // fallback
-}
+});
 
-function setupUI() {
-  shopUI = document.createElement('div');
-  shopUI.style.position = 'absolute';
-  shopUI.style.top = '10px';
-  shopUI.style.left = '10px';
-  shopUI.style.padding = '10px';
-  shopUI.style.backgroundColor = 'rgba(0,0,0,0.5)';
-  shopUI.style.color = 'white';
-  shopUI.style.fontFamily = 'sans-serif';
-  shopUI.innerHTML = `
-    <div>💰 Money: <span id="money">0</span></div>
-    <div>🎒 Capacity: <span id="capacity">10</span></div>
-    <button id="upgrade">Upgrade Backpack (Cost: 50)</button>
-  `;
-  document.body.appendChild(shopUI);
-
-  capacityText = document.getElementById('capacity');
-  moneyText = document.getElementById('money');
-  document.getElementById('upgrade').onclick = upgradeBackpack;
-}
-
-function upgradeBackpack() {
-  const cost = 50;
+// Shop
+document.getElementById('upgradeBackpack').addEventListener('click', () => {
+  const cost = capacity * 10;
   if (money >= cost) {
     money -= cost;
-    capacity += 10;
-    updateUI();
+    capacity += 5;
+    document.getElementById('money').innerText = money;
+    document.getElementById('capacity').innerText = `${currentOre}/${capacity}`;
   }
-}
+});
 
-function updateUI() {
-  capacityText.textContent = capacity;
-  moneyText.textContent = money;
+// Pet system
+const pets = [];
+function spawnPet() {
+  const pet = new THREE.Mesh(
+    new THREE.SphereGeometry(0.5, 16, 16),
+    new THREE.MeshStandardMaterial({ color: 0xff00ff })
+  );
+  pet.position.set(player.position.x + 1, 0.5, player.position.z + 1);
+  scene.add(pet);
+  pets.push(pet);
 }
+spawnPet();
 
+// Animate
 function animate() {
   requestAnimationFrame(animate);
 
-  handlePlayerMovement();
-  checkMining();
+  // Player movement
+  const speed = 0.15;
+  if (keysPressed['w']) player.position.z -= speed;
+  if (keysPressed['s']) player.position.z += speed;
+  if (keysPressed['a']) player.position.x -= speed;
+  if (keysPressed['d']) player.position.x += speed;
 
   camera.position.x = player.position.x;
   camera.position.z = player.position.z + 10;
   camera.lookAt(player.position);
 
+  // Pet follow
+  pets.forEach(pet => {
+    const dx = player.position.x - pet.position.x;
+    const dz = player.position.z - pet.position.z;
+    pet.position.x += dx * 0.05;
+    pet.position.z += dz * 0.05;
+  });
+
+  // Expand mine over time
+  if (money > mineSize * 2) {
+    mineSize += 10;
+    generateMine();
+  }
+
   renderer.render(scene, camera);
 }
-
-function handlePlayerMovement() {
-  if (keysPressed['w']) player.position.z -= playerSpeed;
-  if (keysPressed['s']) player.position.z += playerSpeed;
-  if (keysPressed['a']) player.position.x -= playerSpeed;
-  if (keysPressed['d']) player.position.x += playerSpeed;
-}
-
-function checkMining() {
-  for (let i = ores.length - 1; i >= 0; i--) {
-    const ore = ores[i];
-    if (player.position.distanceTo(ore.position) < 1.5 && carriedOres < capacity) {
-      const value = ore.userData.type.value;
-      carriedOres++;
-      money += value;
-      minedOres++;
-      scene.remove(ore);
-      ores.splice(i, 1);
-      updateUI();
-
-      if (minedOres >= mineThreshold) {
-        mineSize += 5;
-        mineThreshold += 20;
-        generateMine();
-      }
-    }
-  }
-}
+generateMine();
+animate();
