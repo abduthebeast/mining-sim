@@ -238,3 +238,75 @@ function sellOre() {
     alert("You don't have any ore to sell!");
   }
 }
+// --- Ore system ---
+const oreTypes = [
+  { name: 'Stone', color: 0x888888, value: 1, rarity: 0.6 },
+  { name: 'Iron', color: 0xb7410e, value: 5, rarity: 0.25 },
+  { name: 'Gold', color: 0xffd700, value: 10, rarity: 0.1 },
+  { name: 'Diamond', color: 0x00ffff, value: 25, rarity: 0.05 }
+];
+
+let oreBlocks = [];
+let minedCount = 0;
+let mineSize = 20;
+
+function spawnOreField(centerX = 30, centerZ = 0, size = mineSize) {
+  for (let x = -size / 2; x < size / 2; x += 2) {
+    for (let z = -size / 2; z < size / 2; z += 2) {
+      const oreType = getRandomOreType();
+      const block = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1, 1),
+        new THREE.MeshStandardMaterial({ color: oreType.color })
+      );
+      block.position.set(centerX + x, 0.5, centerZ + z);
+      block.userData = { oreType };
+      scene.add(block);
+      oreBlocks.push(block);
+    }
+  }
+}
+
+function getRandomOreType() {
+  const rand = Math.random();
+  let cumulative = 0;
+  for (const ore of oreTypes) {
+    cumulative += ore.rarity;
+    if (rand < cumulative) return ore;
+  }
+  return oreTypes[0]; // fallback to common
+}
+
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'e') tryMine();
+});
+
+function tryMine() {
+  for (let i = 0; i < oreBlocks.length; i++) {
+    const ore = oreBlocks[i];
+    const dist = player.position.distanceTo(ore.position);
+    if (dist < 2.5) {
+      scene.remove(ore);
+      oreBlocks.splice(i, 1);
+      collectOre(ore.userData.oreType);
+      return;
+    }
+  }
+}
+
+function collectOre(ore) {
+  currentOre++;
+  coins += ore.value;
+  minedCount++;
+
+  document.getElementById('capacity-text').innerText = `Ore: ${currentOre} / ${maxOre}`;
+  document.getElementById('coins-text').innerText = `Coins: ${coins}`;
+
+  if (minedCount % 10 === 0) {
+    mineSize += 10;
+    spawnOreField(30, 0, mineSize);
+  }
+}
+
+// --- Initial mine generation ---
+spawnOreField();
+
