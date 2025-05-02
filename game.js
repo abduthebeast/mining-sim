@@ -1,3 +1,13 @@
+// Add this variable at the top of your script
+let lastMineSize = mineSize;
+
+// Inside the animate() function:
+if (money > lastMineSize * 2) {
+  mineSize += 10;
+  lastMineSize = mineSize;
+  generateMine();
+}
+
 // Game setup
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
@@ -62,33 +72,30 @@ function getRandomOreType() {
   return oreTypes[0];
 }
 
-// Mine generation
-let ores = [];
-let mineSize = 20;
-function generateMine() {
+// Mine generationfunction
+generateMine() {
   const orePositions = new Set(ores.map(o => `${o.position.x},${o.position.z}`));
   const half = mineSize / 2;
 
   for (let x = -half; x < half; x++) {
     for (let z = -half; z < half; z++) {
-      if (Math.abs(x) >= half - 5 || Math.abs(z) >= half - 5) {
-        const key = `${x},${z}`;
-        if (!orePositions.has(key) && Math.random() < 0.3) {
-          const oreType = getRandomOreType();
-          const ore = new THREE.Mesh(
-            new THREE.BoxGeometry(1, 1, 1),
-            new THREE.MeshStandardMaterial({ color: oreType.color })
-          );
-          ore.position.set(x, 0.5, z);
-          ore.userData = { type: oreType };
-          scene.add(ore);
-          ores.push(ore);
-          orePositions.add(key);
-        }
+      const key = `${x},${z}`;
+      if (!orePositions.has(key) && Math.random() < 0.15) {  // lowered from 0.2 to 0.15
+        const oreType = getRandomOreType();
+        const ore = new THREE.Mesh(
+          new THREE.BoxGeometry(1, 1, 1),
+          new THREE.MeshStandardMaterial({ color: oreType.color })
+        );
+        ore.position.set(x, 0.5, z);
+        ore.userData = { type: oreType };
+        scene.add(ore);
+        ores.push(ore);
+        orePositions.add(key);
       }
     }
   }
 }
+
 
 // Mining
 const raycaster = new THREE.Raycaster();
@@ -138,7 +145,7 @@ function animate() {
   requestAnimationFrame(animate);
 
   // Player movement
-  const speed = 0.15;
+  const speed = 0.35;
   if (keysPressed['w']) player.position.z -= speed;
   if (keysPressed['s']) player.position.z += speed;
   if (keysPressed['a']) player.position.x -= speed;
